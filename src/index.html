@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link href="/output.css" rel="stylesheet" />
+  <title>Socket.io Chat Example</title>
+</head>
+
+<body>
+  <div class="flex h-screen w-screen ">
+    <div class="flex w-full flex-col m-4">
+      <h3 class="flex justify-center">Socket.io Chat Example</h3>
+      <div class="flex w-full">
+        <div class="grid grid-cols-2 gap-4 w-full">
+          <div class="truebox flex w-full rounded-lg shadow-2xl h-56">1</div>
+          <div class="falsebox flex w-full rounded-lg shadow-2xl h-56">2</div>
+        </div>
+      </div>
+      <div class="flex mt-2 justify-center">
+        <div class="flex gap-1">
+            <button type="text" class="bg-sky-500 rounded-lg p-1" id="trueButton" placeholder="tr">정상 </button>
+        </div>
+        <div class="flex gap-1 ml-5">
+            <button type="text" class="bg-red-500 rounded-lg p-1" id="falseButton" placeholder="fr">비정상 </button>
+        </div>
+      </div>
+    </div>
+
+    <ul id="chat"></ul>
+
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    $(function () {
+      // 지정 namespace로 접속한다
+      var chat = io('http://localhost:3000/chat'),
+        news = io('/news');
+    // "정상" 버튼에 대한 이벤트 핸들러
+    $("#trueButton").click(function () {
+          sendMessage("1");
+        });
+
+    // "비정상" 버튼에 대한 이벤트 핸들러
+    $("#falseButton").click(function () {
+      sendMessage("2");
+    });
+
+    function sendMessage(msg) {
+      // 서버로 자신의 정보를 전송한다.
+      chat.emit("chat message", {
+        value: msg
+      });
+    }
+
+      // 서버로부터의 메시지가 수신되면
+      chat.on("chat message", function (data) {
+      if (data.value === "1") {
+        $(".truebox").eq(0).addClass("bg-green-500");
+        $(".falsebox").eq(0).removeClass("bg-red-500");
+      } else if (data.value === "2") {
+        $(".falsebox").eq(0).addClass("bg-red-500");
+        $(".truebox").eq(0).removeClass("bg-green-500");
+      }
+    });
+    });
+  </script>
+</body>
+
+</html>
